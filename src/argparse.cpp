@@ -7,7 +7,9 @@
 ap_subparsers *			ap_parser::add_subparsers()
 {
 	ap_subparsers * subparsers = new ap_subparsers();
-	
+
+	_M_subparsers.push_back(subparsers);
+
 	return subparsers;
 }
 std::vector<ap_arg *>		ap_parser::list_positional_args()
@@ -25,6 +27,8 @@ ap_parser *			ap_subparsers::add_parser(
 		const char * name)
 {
 	ap_parser * parser = new ap_parser();
+
+	parser->_M_name = name;
 	
 	_M_parsers.push_back(parser);
 }
@@ -68,9 +72,24 @@ char *			ap_parser::usage(
 {
 	//  usage: test.py [-h] {p0,p1,p2} ...
 	
-	char * s = (char*)malloc(128);
+	char * s = (char*)malloc(512);
 	
-	sprintf(s, "usage: %s [-h]", av[0]);
+	if(_M_subparsers.empty()) {
+		sprintf(s, "usage: %s [-h]", av[0]);
+	} else {
+		sprintf(s, "usage: %s [-h]", av[0]);
+
+		for(auto subparser : _M_subparsers) {
+			strcat(s, " {");
+			for(auto parser : subparser->_M_parsers) {
+				char c[64];
+				sprintf(c, "%s,", parser->_M_name);
+				strcat(s, c);
+			}
+			strcat(s, "}");
+		}
+		strcat(s, " ...");
+	}
 
 	return s;
 }

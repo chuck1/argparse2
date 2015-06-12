@@ -30,7 +30,7 @@ public:
 		char ** av);
 	std::vector<ap_arg *>			list_positional_args();
 
-
+	char const *				_M_name;
 	std::vector<ap_arg *>			_M_args;
 	std::vector<ap_subparsers *>		_M_subparsers;
 };
