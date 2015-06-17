@@ -66,19 +66,13 @@ void			ap_args::call(
 		struct ap_args * args_1)
 {
 }
-char *			ap_parser::usage(
-		int ac,
-		char ** av)
+char *			ap_parser::subparsers_str()
 {
-	//  usage: test.py [-h] {p0,p1,p2} ...
-	
-	char * s = (char*)malloc(512);
-	
-	if(_M_subparsers.empty()) {
-		sprintf(s, "usage: %s [-h]", av[0]);
-	} else {
-		sprintf(s, "usage: %s [-h]", av[0]);
+	char * s = new char[512];
 
+	if(_M_subparsers.empty()) {
+		strcat(s, "");
+	} else {
 		for(auto subparser : _M_subparsers) {
 			strcat(s, " {");
 			for(auto parser : subparser->_M_parsers) {
@@ -88,7 +82,20 @@ char *			ap_parser::usage(
 			}
 			strcat(s, "}");
 		}
-		strcat(s, " ...");
+	}
+	return s;
+}
+char *			ap_parser::usage(
+		int ac,
+		char ** av)
+{
+	//  usage: test.py [-h] {p0,p1,p2} ...
+	
+	char * s = new char[512];
+
+	if(_M_subparsers.empty()) {
+	} else {
+		sprintf(s, "usage: %s [-h] %s ...", av[0], subparsers_str());
 	}
 
 	return s;
@@ -97,8 +104,39 @@ void			ap_parser::help(
 		int ac,
 		char ** av)
 {
-	printf("%s\n", usage(ac, av));
+	printf("%s\n\n", usage(ac, av));
+	printf("positional arguments:\n");
+
+	if(_M_subparsers.empty()) {
+	} else {
+		printf("  %s\n", subparsers_str());
+	}
+	
+	printf("\n");
+	printf("optional arguments:\n");
+	for(auto arg : _M_args) {
+		printf("  %s\n", arg->help());
+	}
 }
+char *			ap_arg::help()
+{
+	char * s = new char[256];
+	char * arg_str = new char[128];
+
+	//name help nargs
+
+	if(_M_nargs == 0) { // store true
+		strcat(arg_str, " ");
+	} else if(_M_nargs == -1) { // nargs = "+"
+		sprintf(arg_str, " %s [%s ...] ", _M_name, _M_name);
+	} else if(_M_nargs == -2) { // nargs = "*"
+		sprintf(arg_str, " [%s [%s ...]] ", _M_name, _M_name);
+	}
+
+	sprintf(s, "  %s%s%s\n", _M_name, arg_str, _M_help);
+	return s;
+}
+
 
 
 

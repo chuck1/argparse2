@@ -25,6 +25,7 @@ public:
 	void					help(
 			int ac,
 			char ** av);
+	char *					subparsers_str();
 	char *					usage(
 		int ac,
 		char ** av);
@@ -53,7 +54,10 @@ public:
 	char const *			_M_name;
 	char const *			_M_help;
 	int				_M_nargs;
+
+	char *				help();
 };
+
 
 
 /**
